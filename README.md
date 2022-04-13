@@ -29,6 +29,7 @@ cli_subsonic random <on|off>
 cli_subsonic stop
 cli_subsonic status
 cli_subsonic clean
+cli_subsonic favorite
 ```
 ## Credit
 Part of the code comes from this [repository](https://github.com/wildeyedskies/stmp).

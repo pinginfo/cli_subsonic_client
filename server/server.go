@@ -166,11 +166,18 @@ func handleCommand(conn net.Conn) {
 	} else if cmd.Command == "clean" {
 		myPlayer.CleanQueue()
 		conn.Write([]byte(myPlayer.Actual()))
+	} else if cmd.Command == "favorite" {
+		saveSongInFile(myPlayer.Actual())
+		conn.Write([]byte("song added into favorite file"))
 	} else {
 		if myPlayer.IsPaused() {
 			conn.Write([]byte("nil"))
 		} else {
-			conn.Write([]byte(myPlayer.Actual()))
+			str := myPlayer.Actual()
+			if len(str) > 20 {
+				str = str[:20]
+			}
+			conn.Write([]byte(str))
 		}
 	}
 }
@@ -181,4 +188,18 @@ func getNamesMusics(musics []api.SubsonicEntity) string {
 		str += music.Title + "\n"
 	}
 	return str
+}
+
+func saveSongInFile(name string) {
+	f, err := os.OpenFile(os.Getenv("HOME")+"/.favorites_song", os.O_APPEND|os.O_WRONLY, 0644)
+	if err != nil {
+		fmt.Println(err.Error())
+		return
+	}
+	_, err = fmt.Fprintln(f, name)
+	if err != nil {
+		fmt.Println(err.Error())
+		return
+	}
+	return
 }
