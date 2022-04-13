@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"math/rand"
+	"time"
 
 	"github.com/yourok/go-mpv/mpv"
 )
@@ -47,6 +48,7 @@ func eventListener(m *mpv.Mpv, p *Player) {
 
 func InitPlayer() (*Player, error) {
 	mpvInstance := mpv.Create()
+	rand.Seed(time.Now().UnixNano())
 
 	// TODO figure out what other mpv options we need
 	mpvInstance.SetOptionString("audio-display", "no")
