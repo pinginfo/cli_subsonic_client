@@ -5,10 +5,11 @@ import (
 	"fmt"
 	"net"
 	"os"
+	"strconv"
+
 	"ping/cli_subsonic_client/api"
 	"ping/cli_subsonic_client/command"
 	"ping/cli_subsonic_client/player"
-	"strconv"
 )
 
 var (
@@ -162,7 +163,9 @@ func handleCommand(conn net.Conn) {
 		myPlayer.Stop()
 		conn.Write([]byte(myPlayer.Actual()))
 	} else if cmd.Command == "status" {
-		conn.Write([]byte(myPlayer.Actual()))
+		vol := strconv.FormatInt(myPlayer.AdjustVolume(0), 10)
+		act := myPlayer.Actual()
+		conn.Write([]byte(act + " " + vol + "%"))
 	} else if cmd.Command == "clean" {
 		myPlayer.CleanQueue()
 		conn.Write([]byte(myPlayer.Actual()))
@@ -174,9 +177,6 @@ func handleCommand(conn net.Conn) {
 			conn.Write([]byte("nil"))
 		} else {
 			str := myPlayer.Actual()
-			if len(str) > 20 {
-				str = str[:20]
-			}
 			conn.Write([]byte(str))
 		}
 	}

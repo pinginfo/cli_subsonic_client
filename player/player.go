@@ -4,9 +4,10 @@ import (
 	"errors"
 	"fmt"
 	"math/rand"
+	"os/exec"
 	"time"
 
-	"github.com/yourok/go-mpv/mpv"
+	"github.com/wildeyedskies/go-mpv/mpv"
 )
 
 const (
@@ -32,6 +33,12 @@ type Player struct {
 	Random            bool
 }
 
+func refresh_waybar() {
+	var pkill string = "pkill"
+	args := []string{"-RTMIN+8", "waybar"}
+	exec.Command(pkill, args...).Output()
+}
+
 func eventListener(m *mpv.Mpv, p *Player) {
 	go func() {
 		for {
@@ -41,6 +48,7 @@ func eventListener(m *mpv.Mpv, p *Player) {
 			}
 			if e.Event_Id == mpv.EVENT_END_FILE && e.Data.(mpv.EventEndFile).Reason == mpv.END_FILE_REASON_EOF {
 				p.PlayNextTrack()
+				refresh_waybar()
 			}
 		}
 	}()
@@ -59,7 +67,7 @@ func InitPlayer() (*Player, error) {
 		mpvInstance.TerminateDestroy()
 		return nil, err
 	}
-	player := Player{mpvInstance, nil, nil, false, 0, false, false}
+	player := Player{mpvInstance, nil, nil, false, 0, true, true}
 	eventListener(mpvInstance, &player)
 	return &player, nil
 }
@@ -135,6 +143,7 @@ func (p *Player) IsPaused() bool {
 func (p *Player) Pause() int {
 	loaded := p.IsSongLoaded()
 	pause := p.IsPaused()
+	refresh_waybar()
 
 	if loaded {
 		if pause {
@@ -171,6 +180,7 @@ func (p *Player) AdjustVolume(increment int64) int64 {
 
 	p.Instance.SetProperty("volume", mpv.FORMAT_INT64, newVolume)
 
+	refresh_waybar()
 	return newVolume
 }
 
