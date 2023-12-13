@@ -1,0 +1,3 @@
+FROM docker.io/golang:alpine
+
+RUN apk update && apk add --no-cache build-base make mpv mpv-dev
